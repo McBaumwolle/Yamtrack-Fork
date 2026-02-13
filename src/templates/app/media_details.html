@@ -447,12 +447,14 @@
               {% endif %}
             </div>
           {% endfor %}
+
           <div>
             <h3 class="text-sm font-semibold text-gray-400">Source</h3>
             <a href="{{ media.source_url }}"
                class="text-gray-200 hover:text-indigo-500 transition-colors duration-200"
                target="_blank">{{ media.source|source_readable }}</a>
           </div>
+
           {% if media.external_links %}
             <div class="mt-4">
               <h3 class="text-sm font-semibold text-gray-400">EXTERNAL LINKS</h3>
@@ -461,6 +463,37 @@
                    class="text-gray-200 hover:text-indigo-500 transition-colors duration-200 block"
                    target="_blank">{{ name }}</a>
               {% endfor %}
+            </div>
+          {% endif %}
+
+          {% if media.cast %}
+            <div class="mt-6" x-data="{ expanded: false }">
+              <h3 class="text-sm font-semibold text-gray-400">CAST</h3>
+
+              {# The first 4 actors (Always visible) #}
+              {% for person in media.cast|slice:":4" %}
+                <div class="mb-2 mt-2">
+                  <p class="text-gray-200 text-sm font-medium">{{ person.name }}</p>
+                  <p class="text-gray-500 text-xs">{{ person.character }}</p>
+                </div>
+              {% endfor %}
+
+              {# The rest of the actors (Hidden by default) #}
+              {% if media.cast|length > 4 %}
+                <div x-show="expanded" x-collapse style="display: none;">
+                  {% for person in media.cast|slice:"4:" %}
+                    <div class="mb-2 mt-2">
+                      <p class="text-gray-200 text-sm font-medium">{{ person.name }}</p>
+                      <p class="text-gray-500 text-xs">{{ person.character }}</p>
+                    </div>
+                  {% endfor %}
+                </div>
+
+                {# Toggle Button matching 'Read more' style from descriptions #}
+                <button @click="expanded = !expanded"
+                        class="text-indigo-400 hover:text-indigo-300 text-sm mt-1 transition-colors duration-200 cursor-pointer focus:outline-none"
+                        x-text="expanded ? 'Show less' : 'Show all'"></button>
+              {% endif %}
             </div>
           {% endif %}
         {% else %}
