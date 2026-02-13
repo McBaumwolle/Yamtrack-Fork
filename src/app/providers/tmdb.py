@@ -188,6 +188,19 @@ def movie(media_id):
             item for item in recommended_items if item["id"] not in collection_ids
         ]
 
+        cast = response.get("credits", {}).get("cast", [])
+        filtered_cast = [
+            {
+                "id": member.get("id"),
+                "name": member.get("name"),
+                "character": member.get("character"),
+                # had issues here so manual building.
+                "image": f"https://image.tmdb.org/t/p/w500{member.get('profile_path')}" 
+                         if member.get("profile_path") else None,
+            }
+            for member in cast[:10]     # TODO: Could load all!?
+        ]
+
         data = {
             "media_id": media_id,
             "source": Sources.TMDB.value,
@@ -209,6 +222,7 @@ def movie(media_id):
                 "country": get_country(response["production_countries"]),
                 "languages": get_languages(response["spoken_languages"]),
             },
+            "cast": filtered_cast,
             "related": {
                 collection_response.get("name", "collection"): collection_items,
                 "recommendations": get_related(
