@@ -195,10 +195,11 @@ def movie(media_id):
                 "name": member.get("name"),
                 "character": member.get("character"),
                 # had issues here so manual building.
-                "image": f"https://image.tmdb.org/t/p/w500{member.get('profile_path')}" 
-                         if member.get("profile_path") else None,
+                "image": f"https://image.tmdb.org/t/p/w500{member.get('profile_path')}"
+                if member.get("profile_path")
+                else None,
             }
-            for member in cast[:10]     # TODO: Could load all!?
+            for member in cast[:10]  # TODO: Could load all!?
         ]
 
         data = {
