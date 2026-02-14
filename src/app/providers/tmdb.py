@@ -433,8 +433,17 @@ def process_tv(response):
         },
         "tvdb_id": response.get("external_ids", {}).get("tvdb_id"),
         "external_links": get_external_links(response.get("external_ids", {})),
-        # NEW: CAST DATA
-        "cast": response.get("credits", {}).get("cast", []),
+        "cast": [
+            {
+                "id": member.get("id"),
+                "name": member.get("name"),
+                "character": member.get("character"),
+                "image": f"https://image.tmdb.org/t/p/w500{member.get('profile_path')}"
+                if member.get("profile_path")
+                else settings.IMG_NONE,
+            }
+            for member in response.get("credits", {}).get("cast", [])  # [:10]
+        ],
         "last_episode_season": last_episode["season_number"] if last_episode else None,
         "next_episode_season": next_episode["season_number"] if next_episode else None,
     }
@@ -477,6 +486,17 @@ def process_season(response):
             "runtime": avg_runtime,
             "total_runtime": total_runtime,
         },
+        "cast": [
+            {
+                "id": member.get("id"),
+                "name": member.get("name"),
+                "character": member.get("character"),
+                "image": f"https://image.tmdb.org/t/p/w500{member.get('profile_path')}"
+                if member.get("profile_path")
+                else settings.IMG_NONE,
+            }
+            for member in response.get("credits", {}).get("cast", [])  # [:10]
+        ],
         "episodes": response["episodes"],
     }
 
