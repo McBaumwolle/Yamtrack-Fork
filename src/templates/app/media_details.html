@@ -347,41 +347,35 @@
 
       {% if media.cast %}
         <div class="w-full mb-12 block clear-both"
-             x-data="{ castExpanded: false }">
+             x-data="{ castExpanded: false, isClamped: false, rowHeight: 260, fullHeight: 2000, checkClamp() { if (this.$refs.castContainer && this.$refs.castContainer.children.length > 0) { this.rowHeight = this.$refs.castContainer.children[0].offsetHeight; this.fullHeight = this.$refs.castContainer.scrollHeight; this.isClamped = this.fullHeight > (this.rowHeight + 20); } } }"
+             x-init="$nextTick(() => { checkClamp(); setTimeout(() => checkClamp(), 500); })"
+             @resize.window.debounce.200ms="checkClamp()">
           <h2 class="text-xl font-bold mb-4">Cast</h2>
 
-          <div class="flex flex-wrap gap-4">
-            {% for cast in media.cast %}
-
-              <div x-show="castExpanded || {{ forloop.counter0 }} < 7"
-                   x-transition:enter="transition ease-out duration-300"
-                   x-transition:enter-start="opacity-0 scale-95"
-                   x-transition:enter-end="opacity-100 scale-100"
-                   class="w-32 sm:w-36 flex-none"
-                   {% if forloop.counter0 >= 6 %}style="display: none;"{% endif %}>
-                {% include "app/components/cast_card.html" with cast=cast %}
-              </div>
-
-            {% endfor %}
+          <div class="overflow-hidden transition-[max-height] duration-300 ease-in-out"
+               :style="castExpanded ? `max-height: ${fullHeight}px;` : `max-height: ${rowHeight}px;`">
+            <div x-ref="castContainer" class="flex flex-wrap gap-4">
+              {% for cast in media.cast %}
+                <div class="w-32 sm:w-36 flex-none">{% include "app/components/cast_card.html" with cast=cast %}</div>
+              {% endfor %}
+            </div>
           </div>
 
-          {% if media.cast|length > 7 %}
-            <button @click="castExpanded = !castExpanded"
-                    class="flex items-center gap-1 text-indigo-400 hover:text-indigo-300 text-sm mt-4 font-semibold transition-colors cursor-pointer focus:outline-none">
-              <span x-text="castExpanded ? 'Show less' : 'Show all'"></span>
-              <svg :class="{'rotate-180': castExpanded}"
-                   class="w-4 h-4 transition-transform duration-200"
-                   fill="none"
-                   stroke="currentColor"
-                   viewBox="0 0 24 24">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path>
-              </svg>
-            </button>
-          {% endif %}
+          <button x-cloak
+                  x-show="isClamped"
+                  @click="castExpanded = !castExpanded"
+                  class="flex items-center gap-1 text-indigo-400 hover:text-indigo-300 text-sm mt-4 font-semibold transition-colors cursor-pointer focus:outline-none">
+            <span x-text="castExpanded ? 'Show less' : 'Show all'"></span>
+            <svg :class="{'rotate-180': castExpanded}"
+                 class="w-4 h-4 transition-transform duration-200"
+                 fill="none"
+                 stroke="currentColor"
+                 viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path>
+            </svg>
+          </button>
         </div>
       {% endif %}
-
-      <!-- CHANGES END (almost) -->
 
       {# Related Media (Recommendations) #}
       {% if media.related %}
