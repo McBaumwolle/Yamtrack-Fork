@@ -340,9 +340,9 @@
       </div>
     </div>
 
-    <!-- CHANGES -->
+    <!-- CHANGES BEGIN -->
 
-    {# RIGHT COLUMN: Cast, Recommendations, Episodes #}
+    {# Cast, Recommendations, Episodes #}
     <div class="w-full md:w-3/4">
 
       {% if media.cast %}
@@ -353,7 +353,7 @@
           <div class="flex flex-wrap gap-4">
             {% for cast in media.cast %}
 
-              <div x-show="castExpanded || {{ forloop.counter0 }} < 6"
+              <div x-show="castExpanded || {{ forloop.counter0 }} < 7"
                    x-transition:enter="transition ease-out duration-300"
                    x-transition:enter-start="opacity-0 scale-95"
                    x-transition:enter-end="opacity-100 scale-100"
@@ -365,7 +365,7 @@
             {% endfor %}
           </div>
 
-          {% if media.cast|length > 6 %}
+          {% if media.cast|length > 7 %}
             <button @click="castExpanded = !castExpanded"
                     class="flex items-center gap-1 text-indigo-400 hover:text-indigo-300 text-sm mt-4 font-semibold transition-colors cursor-pointer focus:outline-none">
               <span x-text="castExpanded ? 'Show less' : 'Show all'"></span>
