@@ -350,7 +350,24 @@
              x-data="{ castExpanded: false, isClamped: false, rowHeight: 260, fullHeight: 2000, checkClamp() { if (this.$refs.castContainer && this.$refs.castContainer.children.length > 0) { this.rowHeight = this.$refs.castContainer.children[0].offsetHeight; this.fullHeight = this.$refs.castContainer.scrollHeight; this.isClamped = this.fullHeight > (this.rowHeight + 20); } } }"
              x-init="$nextTick(() => { checkClamp(); setTimeout(() => checkClamp(), 500); })"
              @resize.window.debounce.200ms="checkClamp()">
-          <h2 class="text-xl font-bold mb-4">Cast</h2>
+
+          {# HEADER WITH BUTTON #}
+          <div class="flex items-center justify-between mb-4">
+            <h2 class="text-xl font-bold">Cast</h2>
+            <button x-cloak
+                    x-show="isClamped"
+                    @click="castExpanded = !castExpanded"
+                    class="flex items-center gap-1 text-indigo-400 hover:text-indigo-300 text-sm font-semibold transition-colors cursor-pointer focus:outline-none">
+              <span x-text="castExpanded ? 'Show less' : 'Show all'"></span>
+              <svg :class="{'rotate-180': castExpanded}"
+                   class="w-4 h-4 transition-transform duration-200"
+                   fill="none"
+                   stroke="currentColor"
+                   viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path>
+              </svg>
+            </button>
+          </div>
 
           <div class="overflow-hidden transition-[max-height] duration-300 ease-in-out"
                :style="castExpanded ? `max-height: ${fullHeight}px;` : `max-height: ${rowHeight}px;`">
@@ -361,20 +378,6 @@
               {% endfor %}
             </div>
           </div>
-
-          <button x-cloak
-                  x-show="isClamped"
-                  @click="castExpanded = !castExpanded"
-                  class="flex items-center gap-1 text-indigo-400 hover:text-indigo-300 text-sm mt-4 font-semibold transition-colors cursor-pointer focus:outline-none">
-            <span x-text="castExpanded ? 'Show less' : 'Show all'"></span>
-            <svg :class="{'rotate-180': castExpanded}"
-                 class="w-4 h-4 transition-transform duration-200"
-                 fill="none"
-                 stroke="currentColor"
-                 viewBox="0 0 24 24">
-              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path>
-            </svg>
-          </button>
         </div>
       {% endif %}
 
@@ -388,7 +391,23 @@
                        x-init="$nextTick(() => { checkClamp(); setTimeout(() => checkClamp(), 500); })"
                        @resize.window.debounce.200ms="checkClamp()">
 
-                <h2 class="text-xl font-bold mb-4">{{ name|no_underscore|title }}</h2>
+                {# HEADER WITH BUTTON #}
+                <div class="flex items-center justify-between mb-4">
+                  <h2 class="text-xl font-bold">{{ name|no_underscore|title }}</h2>
+                  <button x-cloak
+                          x-show="isClamped"
+                          @click="itemsExpanded = !itemsExpanded"
+                          class="flex items-center gap-1 text-indigo-400 hover:text-indigo-300 text-sm font-semibold transition-colors cursor-pointer focus:outline-none">
+                    <span x-text="itemsExpanded ? 'Show less' : 'Show all'"></span>
+                    <svg :class="{'rotate-180': itemsExpanded}"
+                         class="w-4 h-4 transition-transform duration-200"
+                         fill="none"
+                         stroke="currentColor"
+                         viewBox="0 0 24 24">
+                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path>
+                    </svg>
+                  </button>
+                </div>
 
                 <div class="overflow-hidden transition-[max-height] duration-300 ease-in-out"
                      :style="itemsExpanded ? `max-height: ${fullHeight}px;` : `max-height: ${rowHeight}px;` ">
@@ -405,20 +424,6 @@
                     {% endfor %}
                   </div>
                 </div>
-
-                <button x-cloak
-                        x-show="isClamped"
-                        @click="itemsExpanded = !itemsExpanded"
-                        class="flex items-center gap-1 text-indigo-400 hover:text-indigo-300 text-sm mt-4 font-semibold transition-colors cursor-pointer focus:outline-none">
-                  <span x-text="itemsExpanded ? 'Show less' : 'Show all'"></span>
-                  <svg :class="{'rotate-180': itemsExpanded}"
-                       class="w-4 h-4 transition-transform duration-200"
-                       fill="none"
-                       stroke="currentColor"
-                       viewBox="0 0 24 24">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path>
-                  </svg>
-                </button>
               </section>
             {% endif %}
           {% endfor %}
@@ -462,4 +467,16 @@
 
     </div>
   </div>
+
+  <style>
+    /* Force cinematic aspect ratio for posters in these specific containers */
+    #castContainer img,
+    #itemsContainer img {
+      aspect-ratio: 2/3 !important;
+      width: 100% !important;
+      height: auto !important;
+      object-fit: cover !important;
+      border-radius: 0.5rem;
+    }
+  </style>
 {% endblock content %}
