@@ -199,7 +199,7 @@ def movie(media_id):
                 if member.get("profile_path")
                 else None,
             }
-            for member in cast[:10]  # TODO: Could load all!?
+            for member in cast  # was [:10]
         ]
 
         data = {
@@ -231,7 +231,6 @@ def movie(media_id):
                     MediaTypes.MOVIE.value,
                 ),
             },
-            "cast": response.get("credits", {}).get("cast", []),
             "external_links": get_external_links(response.get("external_ids", {})),
         }
 
