@@ -354,9 +354,10 @@
 
           <div class="overflow-hidden transition-[max-height] duration-300 ease-in-out"
                :style="castExpanded ? `max-height: ${fullHeight}px;` : `max-height: ${rowHeight}px;`">
-            <div x-ref="castContainer" class="flex flex-wrap gap-4">
+            <div x-ref="castContainer"
+                 class="grid grid-cols-2 sm:grid-cols-4 lg:grid-cols-6 gap-4">
               {% for cast in media.cast %}
-                <div class="w-32 sm:w-36 flex-none">{% include "app/components/cast_card.html" with cast=cast %}</div>
+                <div>{% include "app/components/cast_card.html" with cast=cast %}</div>
               {% endfor %}
             </div>
           </div>
@@ -382,17 +383,42 @@
         <div class="w-full">
           {% for name, related_items in media.related.items %}
             {% if related_items %}
-              <section class="{% if not forloop.last %}mb-12{% endif %}">
+              <section class="{% if not forloop.last %}mb-12{% endif %}"
+                       x-data="{ itemsExpanded: false, isClamped: false, rowHeight: 300, fullHeight: 2000, checkClamp() { if (this.$refs.itemsContainer && this.$refs.itemsContainer.children.length > 0) { this.rowHeight = this.$refs.itemsContainer.children[0].offsetHeight; this.fullHeight = this.$refs.itemsContainer.scrollHeight; this.isClamped = this.fullHeight > (this.rowHeight + 20); } } }"
+                       x-init="$nextTick(() => { checkClamp(); setTimeout(() => checkClamp(), 500); })"
+                       @resize.window.debounce.200ms="checkClamp()">
+
                 <h2 class="text-xl font-bold mb-4">{{ name|no_underscore|title }}</h2>
-                <div class="grid grid-cols-2 sm:grid-cols-4 lg:grid-cols-6 gap-4">
-                  {% for result in related_items %}
-                    {% if media_type == MediaTypes.MOVIE.value %}
-                      {% include "app/components/media_card.html" with item=result.item title=result.item.season_title|default:result.item.title media=result.media active=media.media_id|str_equals:result.item.media_id %}
-                    {% else %}
-                      {% include "app/components/media_card.html" with item=result.item title=result.item.season_title|default:result.item.title media=result.media %}
-                    {% endif %}
-                  {% endfor %}
+
+                <div class="overflow-hidden transition-[max-height] duration-300 ease-in-out"
+                     :style="itemsExpanded ? `max-height: ${fullHeight}px;` : `max-height: ${rowHeight}px;` ">
+                  <div x-ref="itemsContainer"
+                       class="grid grid-cols-2 sm:grid-cols-4 lg:grid-cols-6 gap-4">
+                    {% for result in related_items %}
+                      <div>
+                        {% if media_type == MediaTypes.MOVIE.value %}
+                          {% include "app/components/media_card.html" with item=result.item title=result.item.season_title|default:result.item.title media=result.media active=media.media_id|str_equals:result.item.media_id %}
+                        {% else %}
+                          {% include "app/components/media_card.html" with item=result.item title=result.item.season_title|default:result.item.title media=result.media %}
+                        {% endif %}
+                      </div>
+                    {% endfor %}
+                  </div>
                 </div>
+
+                <button x-cloak
+                        x-show="isClamped"
+                        @click="itemsExpanded = !itemsExpanded"
+                        class="flex items-center gap-1 text-indigo-400 hover:text-indigo-300 text-sm mt-4 font-semibold transition-colors cursor-pointer focus:outline-none">
+                  <span x-text="itemsExpanded ? 'Show less' : 'Show all'"></span>
+                  <svg :class="{'rotate-180': itemsExpanded}"
+                       class="w-4 h-4 transition-transform duration-200"
+                       fill="none"
+                       stroke="currentColor"
+                       viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path>
+                  </svg>
+                </button>
               </section>
             {% endif %}
           {% endfor %}
