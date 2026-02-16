@@ -198,7 +198,7 @@ def movie(media_id):
                 if member.get("profile_path")
                 else None,
             }
-            for member in cast[:10]
+            for member in cast[:30]
         ]
 
         data = {
