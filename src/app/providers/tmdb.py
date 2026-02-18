@@ -228,6 +228,7 @@ def movie(media_id):
                     MediaTypes.MOVIE.value,
                 ),
             },
+            "cast": response.get("credits", {}).get("cast", []),
             "external_links": get_external_links(response.get("external_ids", {})),
         }
 
@@ -272,7 +273,7 @@ def enrich_season_with_tv_data(season_data, tv_data, media_id, season_number):
 def fetch_and_cache_seasons(media_id, season_numbers, tv_data):
     """Fetch uncached seasons from API and cache them."""
     url = f"{base_url}/tv/{media_id}"
-    base_append = "recommendations,external_ids"
+    base_append = "recommendations,external_ids,credits"
     max_seasons_per_request = 18
     fetched_tv_data = tv_data
     result_data = {}
@@ -369,7 +370,7 @@ def tv(media_id):
         url = f"{base_url}/tv/{media_id}"
         params = {
             **base_params,
-            "append_to_response": "recommendations,external_ids",
+            "append_to_response": "recommendations,external_ids,credits",
         }
 
         try:
@@ -430,6 +431,8 @@ def process_tv(response):
         },
         "tvdb_id": response.get("external_ids", {}).get("tvdb_id"),
         "external_links": get_external_links(response.get("external_ids", {})),
+        # NEW: CAST DATA
+        "cast": response.get("credits", {}).get("cast", []),
         "last_episode_season": last_episode["season_number"] if last_episode else None,
         "next_episode_season": next_episode["season_number"] if next_episode else None,
     }
